@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const jwt = require('jsonwebtoken');
 
 // Controller function to handle user signup
 const signupUser = async (req, res) => {
@@ -81,14 +82,43 @@ const loginUser = async (req, res) => {
             }
         }
 
-        res.status(200).json({ msg: 'Login successful', user });
+        // Generate JWT token
+        const tokenJWT = jwt.sign(
+            { 
+                id: user.id, email: user.email,
+                name: user.name
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        // Send response with token
+        res.status(200).json({
+            msg: 'Login successful',
+            token: tokenJWT,
+        });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ msg: 'Server error' });
     }
 };
 
+const getProfile = (req, res) => {
+    try {
+        const user = req.user;
+        res.status(200).json({
+            msg: 'Profile fetched successfully',
+            user
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: 'Failed to fetch profile' });
+    }
+};
+
 module.exports = {
     signupUser,
-    loginUser
+    loginUser,
+    getProfile
 };
