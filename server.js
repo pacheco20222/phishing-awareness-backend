@@ -5,6 +5,12 @@ const app = express();
 // Define the port
 const PORT = 3000;
 
+// Import the database connection
+const connectDB = require('./config/db');
+
+// Connect to the database
+connectDB();
+
 require('dotenv').config();
 
 // Enable JSON parsing

@@ -10,6 +10,12 @@ router.post('/signup', signupUser);
 // Login route
 router.post('/login', loginUser);
 
+// Update user route
+router.put('/update/:id', verifyToken, updateUser);
+
+// Delete user route
+router.delete('/delete/:id', verifyToken, deleteUser);
+
 // Protected route
 router.get('/profile', verifyToken, getProfile);
 
