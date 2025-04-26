@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { signupUser, loginUser, getProfile } = require('../controllers/authController');
+const { signupUser, loginUser, getProfile, updateUser, deleteUser } = require('../controllers/authController');
 const verifyToken = require('../middleware/verifyToken');
 
 // Signup route
