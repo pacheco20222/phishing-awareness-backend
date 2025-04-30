@@ -40,6 +40,7 @@ The backend supports:
    ```env
    MONGO_URI=your_mongo_db_connection_string
    JWT_SECRET=your_secret_key
+   TWO_FA_ENCRYPTION_KEY=your_encryption_key
    ```
 
 4. Start the server locally:
