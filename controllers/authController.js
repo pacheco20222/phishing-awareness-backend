@@ -3,6 +3,26 @@ const User = require('../models/User');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
+const algorithm = 'aes-256-cbc';
+const encryptionKey = crypto.createHash('sha256').update(String(process.env.TWO_FA_ENCRYPTION_KEY)).digest('base64').substr(0, 32);
+const iv = crypto.randomBytes(16);
+
+const encryptSecret = (secret) => {
+    const cipher = crypto.createCipheriv(algorithm, encryptionKey, iv);
+    let encrypted = cipher.update(secret, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return `${iv.toString('hex')}:${encrypted}`;
+};
+
+const decryptSecret = (encryptedSecret) => {
+    const [ivHex, encrypted] = encryptedSecret.split(':');
+    const decipher = crypto.createDecipheriv(algorithm, encryptionKey, Buffer.from(ivHex, 'hex'));
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+};
 
 // Controller function to handle user signup
 const signupUser = async (req, res) => {
@@ -43,7 +63,7 @@ const signupUser = async (req, res) => {
             phone_number,
             country,
             job,
-            two_factor_secret: secret.base32,
+            two_factor_secret: encryptSecret(secret.base32),
             two_factor_enabled: true
         });
 
@@ -53,9 +73,12 @@ const signupUser = async (req, res) => {
         const otpauth_url = secret.otpauth_url;
         const qrCodeDataURL = await qrcode.toDataURL(otpauth_url);
 
+        // TODO: Encrypt the 2FA secret before saving it in production environments
         res.status(201).json({
             msg: 'User registered successfully',
-            qr: qrCodeDataURL
+            qr: qrCodeDataURL,
+            two_factor_secret: secret.base32, // for use in Authenticator manually
+            otpauth_url: otpauth_url          // for backup use in generating QR or OTPs
         });
     } catch (err) {
         console.error(err);
@@ -82,7 +105,7 @@ const loginUser = async (req, res) => {
         // Check 2FA
         if (user.two_factor_enabled) {
             const verified = speakeasy.totp.verify({
-                secret: user.two_factor_secret,
+                secret: decryptSecret(user.two_factor_secret),
                 encoding: 'base32',
                 token: token
             });
