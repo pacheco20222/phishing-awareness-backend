@@ -88,7 +88,7 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const { email, password, token } = req.body;
+        const { email, password, twoFactorToken } = req.body;
 
         // Find user by email
         const user = await User.findOne({ email });
@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
             const verified = speakeasy.totp.verify({
                 secret: decryptSecret(user.two_factor_secret),
                 encoding: 'base32',
-                token: token
+                token: twoFactorToken
             });
 
             if (!verified) {
@@ -137,9 +137,14 @@ const loginUser = async (req, res) => {
     }
 };
 
-const getProfile = (req, res) => {
+const getProfile = async (req, res) => {
     try {
-        const user = req.user;
+        const user = await User.findById(req.user.id).select('-password -two_factor_secret');
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
         res.status(200).json({
             msg: 'Profile fetched successfully',
             user
@@ -154,9 +159,15 @@ const getProfile = (req, res) => {
 // Updating a user
 const updateUser = async (req, res) => {
     try {
-        
         const { id } = req.params;
-        const updateData = req.body;
+        const allowedFields = ['email', 'phone_number', 'country', 'job'];
+        const updateData = {};
+
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                updateData[field] = req.body[field];
+            }
+        });
 
         const updateUser = await User.findByIdAndUpdate(id, updateData, { new: true });
         if (!updateUser) {
@@ -176,8 +187,10 @@ const updateUser = async (req, res) => {
 // Deleting a user
 const deleteUser = async (req, res) => {
     try {
-        
-        const { id } =  req.params;
+        const { id } = req.params;
+        if (req.user.id !== id) {
+            return res.status(403).json({ msg: 'Unauthorized to delete this user' });
+        }
         const deleteUser = await User.findByIdAndDelete(id);
         if (!deleteUser) {
             return res.status(404).json({ msg: 'User not found' });

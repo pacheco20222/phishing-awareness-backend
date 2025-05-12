@@ -2,6 +2,7 @@
 const express = require('express');
 // Create the express app
 const app = express();
+const path = require('path');
 // Define the port
 const PORT = 3000;
 
@@ -16,9 +17,39 @@ require('dotenv').config();
 // Enable JSON parsing
 app.use(express.json());
 
-// Basic route to homepage
+const frontendPath = path.join(__dirname, '..', 'Phishing-Awareness-Prevention-Website.');
+app.use(express.static(path.join(frontendPath, 'public')));
+
 app.get('/', (req, res) => {
-    res.send('Backend server is running');
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'index.html'));
+});
+
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'signup.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'login.html'));
+});
+
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'profile.html'));
+});
+
+app.get('/contact', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'contact.html'));
+});
+
+app.get('/examples', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'examples.html'));
+});
+
+app.get('/phishing', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'phishing.html'));
+});
+
+app.get('/protection', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'protection.html'));
 });
 
 // Start the server
