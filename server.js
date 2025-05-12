@@ -17,7 +17,7 @@ require('dotenv').config();
 // Enable JSON parsing
 app.use(express.json());
 
-const frontendPath = path.join(__dirname, '..', 'Phishing-Awareness-Prevention-Website.');
+const frontendPath = path.join(__dirname, '..', 'Phishing-Awareness-Prevention-Website');
 app.use(express.static(path.join(frontendPath, 'public')));
 
 app.get('/', (req, res) => {
