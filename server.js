@@ -52,6 +52,11 @@ app.get('/protection', (req, res) => {
     res.sendFile(path.join(frontendPath, 'public', 'views', 'protection.html'));
 });
 
+app.get('/report', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'public', 'views', 'report.html'));
+});
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
@@ -59,3 +64,6 @@ app.listen(PORT, () => {
 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
+const searchRoutes = require('./routes/search_route');
+app.use('/api/reports', searchRoutes);

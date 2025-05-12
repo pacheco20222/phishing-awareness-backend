@@ -58,6 +58,28 @@ The backend supports:
 | PUT    | `/api/auth/update/:id` | Update user data (protected) |
 | DELETE | `/api/auth/delete/:id` | Delete a user (protected) |
 
+> ## 🧪 How to Run Locally with Frontend
+
+> To run this backend locally and serve the frontend:
+
+> 1. Clone both this backend repo and the frontend repo into the **same parent directory**.
+> 2. Navigate into the backend project folder.
+> 3. Install dependencies:
+>    ```
+>    npm install
+>    ```
+> 4. Create a `.env` file with your environment variables (e.g., MongoDB URI, JWT secret, 2FA key).
+> 5. Start the backend server:
+>    ```
+>    npm run dev
+>    ```
+> 6. Open your browser and visit:
+>    ```
+>    http://localhost:3000
+>    ```
+
+> 🔗 Make sure your `server.js` is serving the frontend's `/public` folder.
+
 ## 🌎 Deployment
 
 The backend is deployed on Render and can be accessed at:
@@ -70,3 +92,5 @@ Replace `<your-subdomain>` with your actual deployment URL.
 ## 📄 License
 
 This project is for educational purposes as part of the Programación para Internet SIS3410 course.
+
+© 2025 Phishing Awareness. Educational project for cybersecurity training.
